@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package com.intel.multicamera;
+package com.intel.AdvancedMultiCamera;
 
 import android.app.Activity;
 import android.app.Dialog;
@@ -148,7 +148,41 @@ public class CameraBase  {
         StartVideoRecording(RecordButton, PictureButton, CameraSwitch, CameraSplit, Settings);
         CameraSplit(CameraSplit);
     }
-
+    
+    private void applyAdvancedSettingsToPreview() {
+      SharedPreferences sharedPreferences = mActivity.getPreferences(Context.MODE_PRIVATE);
+  
+      boolean autoFocusEnabled = sharedPreferences.getBoolean("pref_auto_focus", true);
+      boolean autoExposureEnabled = sharedPreferences.getBoolean("pref_auto_exposure", true);
+      boolean autoWhiteBalanceEnabled = sharedPreferences.getBoolean("pref_auto_white_balance", true);
+  
+      if (autoFocusEnabled) {
+          captureRequestBuilder.set(CaptureRequest.CONTROL_AF_MODE, CaptureRequest.CONTROL_AF_MODE_CONTINUOUS_PICTURE);
+          Log.d(TAG, "divy Auto Focus enabled");
+      }
+      else {
+          captureRequestBuilder.set(CaptureRequest.CONTROL_AF_MODE, CaptureRequest.CONTROL_AF_MODE_OFF);
+          Log.d(TAG, "divy Auto Focus disabled");
+      }
+  
+      if (autoExposureEnabled) {
+          captureRequestBuilder.set(CaptureRequest.CONTROL_AE_MODE, CaptureRequest.CONTROL_AE_MODE_ON);
+          Log.d(TAG, "divy Auto Exposure enabled");
+      }
+      else {
+          captureRequestBuilder.set(CaptureRequest.CONTROL_AE_MODE, CaptureRequest.CONTROL_AE_MODE_OFF);
+          Log.d(TAG, "divy Auto Exposure disabled");
+      }
+  
+      if (autoWhiteBalanceEnabled) {
+          captureRequestBuilder.set(CaptureRequest.CONTROL_AWB_MODE, CaptureRequest.CONTROL_AWB_MODE_AUTO);
+          Log.d(TAG, "divy Auto White Balance enabled");
+      }
+      else {
+          captureRequestBuilder.set(CaptureRequest.CONTROL_AWB_MODE, CaptureRequest.CONTROL_AWB_MODE_OFF);
+          Log.d(TAG, "divy Auto White Balance disabled");
+      }
+  }
 
     private void TakePicureOnClicked(ImageButton PictureButton) {
         takePictureButton = PictureButton;
@@ -483,6 +517,10 @@ public class CameraBase  {
                     mCameraDevice.createCaptureRequest(CameraDevice.TEMPLATE_PREVIEW);
 
             captureRequestBuilder.addTarget(surface);
+            
+            Log.i(TAG, "divy in capturePreview");
+            applyAdvancedSettingsToPreview();
+            Log.i(TAG, "divy in capturePreview 1");
 
             mCameraDevice.createCaptureSession(
                     outputSurfaces, new CameraCaptureSession.StateCallback() {
